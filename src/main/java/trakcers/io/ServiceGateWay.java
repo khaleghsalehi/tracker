@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import trakcers.io.cacher.FastCache;
 import trakcers.io.model.TrackEvent;
 import trakcers.io.repo.TrackLogRepo;
 
@@ -21,7 +22,7 @@ public class ServiceGateWay {
         Gson gson = new Gson();
         trackEvent = gson.fromJson(rawJson, TrackEvent.class);
         System.out.println("new track entry (event) successfully added. ->" + trackEvent.getDate());
+        FastCache.deviceCache.put(trackEvent.getId(), trackEvent);
         trackLogRepo.save(trackEvent);
     }
-
 }

@@ -3,11 +3,13 @@ package trakcers.io;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import trakcers.io.cacher.FastCache;
 import trakcers.io.model.Device;
 import trakcers.io.model.TrackEvent;
 import trakcers.io.repo.TrackLogRepo;
@@ -25,18 +27,18 @@ public class Web {
     private EntityManager entityManager;
 
     @GetMapping("/")
-    public String indexPage(Model model) {
+    public String indexPage(Model model, @RequestParam(required = false) String device) {
         model.addAttribute("lat", 0);
         model.addAttribute("long", 0);
         model.addAttribute("zoom", 150);
         model.addAttribute("name", "Lucifer");
+        List<String> deviceList= new ArrayList<>(FastCache.deviceCache.asMap().keySet());
+        model.addAttribute("list",deviceList);
         try {
-            List<TrackEvent> list = (List<TrackEvent>) trackLogRepo.findAll();
-            TrackEvent obj = list.getLast();
-
-            System.out.println("last id -> " + obj.getTid());
-            model.addAttribute("lat", obj.getLatitude());
-            model.addAttribute("long", obj.getLongitude());
+            TrackEvent trackEvent = FastCache.deviceCache.get(device);
+            System.out.println("last id -> " + trackEvent.getTid());
+            model.addAttribute("lat", trackEvent.getLatitude());
+            model.addAttribute("long", trackEvent.getLongitude());
             return "index.html";
         } catch (Exception e) {
             return "index.html";
@@ -45,9 +47,9 @@ public class Web {
 
     @GetMapping("/route")
     public String setRoute(Model model,
-                           @RequestParam (required = false) String startDate,
-                           @RequestParam (required = false) String endDate,
-                           @RequestParam (required = false) String deviceId) {
+                           @RequestParam(required = false) String startDate,
+                           @RequestParam(required = false) String endDate,
+                           @RequestParam(required = false) String deviceId) {
 
 
         List<TrackEvent> events = entityManager.createQuery(
@@ -71,7 +73,6 @@ public class Web {
         // Add to model
         model.addAttribute("devices", devices);
         model.addAttribute("points", points);
-
 
 
         return "route.html";
