@@ -1,17 +1,20 @@
 package trakcers.io.model;
 
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Entity
+
 public class Device {
-    private String id;
-    private String name;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    public Device(String id, String name) {
-        this.id = id;
-        this.name = name;
-    }
+    private String deviceId;
 
+    private String deviceName;
+    private String deviceOwner;
 }

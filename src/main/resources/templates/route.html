@@ -90,7 +90,7 @@
         <label for="deviceId">Device:</label>
         <select id="deviceId" name="deviceId" required>
             <option value="">Select</option>
-            <option th:each="d : ${devices}" th:value="${d.id}" th:text="${d.name}"></option>
+            <option th:each="d : ${devices}" th:value="${d.deviceId}" th:text="${d.deviceName}"></option>
         </select>
 
         <button type="submit">Filter</button>

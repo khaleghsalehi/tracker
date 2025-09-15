@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,7 @@ import trakcers.io.cacher.FastCache;
 import trakcers.io.model.Device;
 import trakcers.io.model.TrackEvent;
 import trakcers.io.model.UserAccount;
+import trakcers.io.repo.DeviceRepo;
 import trakcers.io.repo.TrackLogRepo;
 
 import java.util.ArrayList;
@@ -23,21 +25,33 @@ import java.util.stream.Collectors;
 public class Web {
     @Autowired
     TrackLogRepo trackLogRepo;
+    @Autowired
+    DeviceRepo deviceRepo;
 
     @PersistenceContext
     private EntityManager entityManager;
 
+
     @GetMapping("/")
-    public String indexPage(Model model, @RequestParam(required = false) String device) {
+    public String indexPage(Authentication authentication,
+                            Model model,
+                            @RequestParam(required = false) String device) {
         model.addAttribute("lat", 0);
         model.addAttribute("long", 0);
         model.addAttribute("zoom", 150);
         model.addAttribute("name", "Lucifer");
-        List<String> deviceList = new ArrayList<>(FastCache.deviceCache.asMap().keySet());
-        model.addAttribute("list", deviceList);
+        //List<String> deviceList = new ArrayList<>(FastCache.deviceCache.asMap().keySet());
+
+        List<Device> myDevices = entityManager.createQuery(
+                        "SELECT t FROM Device t WHERE t.deviceOwner = :deviceOwner", Device.class)
+                .setParameter("deviceOwner", authentication.getName())
+                .getResultList();
+
+
+
+        model.addAttribute("list", myDevices);
         try {
             TrackEvent trackEvent = FastCache.deviceCache.get(device);
-            System.out.println("last id -> " + trackEvent.getTid());
             model.addAttribute("lat", trackEvent.getLatitude());
             model.addAttribute("long", trackEvent.getLongitude());
             return "index.html";
@@ -47,7 +61,7 @@ public class Web {
     }
 
     @GetMapping("/route")
-    public String setRoute(Model model,
+    public String setRoute(Authentication authentication, Model model,
                            @RequestParam(required = false) String startDate,
                            @RequestParam(required = false) String endDate,
                            @RequestParam(required = false) String deviceId) {
@@ -61,17 +75,17 @@ public class Web {
                 .getResultList();
 
 
-        // Convert to List of [lat, lng]
         List<List<String>> points = events.stream()
                 .map(e -> List.of(e.getLatitude(), e.getLongitude()))
                 .collect(Collectors.toList());
 
-        List<Device> devices = new ArrayList<>();
-        devices.add(new Device("25ec97a58877c8e7", "Tablet"));
-        devices.add(new Device("82fa8c628b501db0", "Others"));
+
+        List<Device> devices = entityManager.createQuery(
+                        "SELECT t FROM Device t WHERE t.deviceOwner = :deviceOwner", Device.class)
+                .setParameter("deviceOwner", authentication.getName())
+                .getResultList();
 
 
-        // Add to model
         model.addAttribute("devices", devices);
         model.addAttribute("points", points);
 
@@ -88,5 +102,11 @@ public class Web {
     public String signUp(Model model) {
         model.addAttribute("registerRequest", new UserAccount());
         return "register.html";
+    }
+
+    @GetMapping("/device")
+    public String registerDevice(Model model) {
+        model.addAttribute("device", new Device());
+        return "device.html";
     }
 }

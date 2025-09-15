@@ -72,8 +72,8 @@
             <label for="device">Device:</label>
             <select id="device" name="device">
                 <option th:each="item : ${list}"
-                        th:value="${item}"
-                        th:text="${item}"
+                        th:value="${item.deviceId}"
+                        th:text="${item.deviceName}"
                         th:selected="${item == device}">
                 </option>
             </select>
@@ -81,6 +81,9 @@
         </form>
 
         <!-- Logout form -->
+        <form action="/device" method="get" style="display:inline;">
+            <button type="submit">Register New Device</button>
+        </form>
         <form th:action="@{/logout}" method="post" style="display:inline;">
             <button type="submit">Logout</button>
         </form>
