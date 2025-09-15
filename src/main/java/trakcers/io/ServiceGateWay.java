@@ -24,5 +24,6 @@ public class ServiceGateWay {
         System.out.println("new track entry (event) successfully added. ->" + trackEvent.getDate());
         FastCache.deviceCache.put(trackEvent.getId(), trackEvent);
         trackLogRepo.save(trackEvent);
+        return;
     }
 }

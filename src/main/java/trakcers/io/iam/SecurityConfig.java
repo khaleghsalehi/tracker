@@ -15,13 +15,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-
-
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/user/**").hasRole("USER")
-                        .requestMatchers("/v1/**").permitAll() // allow /register and static resources
-                        .requestMatchers("/v1").permitAll() // allow /register and static resources
+                        .requestMatchers("/v1/getLocation").permitAll() // allow /register and static resources
                         .requestMatchers("/v1/register").permitAll() // allow /register and static resources
                         .requestMatchers("/register", "/img/**", "/css/**", "/js/**").permitAll() // allow /register and static resources
                         .anyRequest().authenticated()

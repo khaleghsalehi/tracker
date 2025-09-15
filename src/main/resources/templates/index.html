@@ -1,63 +1,117 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Live Lookup</title>
-</head>
-<head>
     <meta charset="UTF-8">
     <meta http-equiv="refresh" content="9">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live Device Lookup</title>
 
-
-    <form th:action="@{/}" method="get">
-        <label for="device">Select Device:</label>
-        <select id="device" name="device">device
-            <option th:each="item : ${list}"
-                    th:value="${item}"
-                    th:text="${item}"
-                    th:selected="${item == device}">
-            </option>
-        </select>
-        <button type="submit">Search</button>
-    </form>
-    <form th:action="@{/logout}" method="post">
-        <button type="submit">Logout</button>
-    </form>
-
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
     <style>
+        /* Reset some default styling */
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            height: 100%;
+        }
+
+        /* Navigation menu */
+        nav {
+            background-color: #2c3e50;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        nav .menu a {
+            color: white;
+            text-decoration: none;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+
+        nav .menu a:hover {
+            text-decoration: underline;
+        }
+
+        /* Forms in navbar */
+        nav form {
+            display: inline;
+        }
+
+        nav select, nav button {
+            padding: 5px 10px;
+            margin-left: 5px;
+            font-size: 1rem;
+        }
+
         /* Fullscreen map container */
         #map {
-          width: 100%;
-          height: 100vh;
+            width: 100%;
+            height: calc(100vh - 60px); /* full height minus navbar */
         }
     </style>
 </head>
 <body>
+
+<!-- Navigation bar -->
+<nav>
+    <div class="menu">
+        <a th:href="@{/}">Home</a>
+        <a th:href="@{/route}">Route</a>
+    </div>
+
+    <div class="controls">
+        <!-- Device selection form -->
+        <form th:action="@{/}" method="get">
+            <label for="device">Device:</label>
+            <select id="device" name="device">
+                <option th:each="item : ${list}"
+                        th:value="${item}"
+                        th:text="${item}"
+                        th:selected="${item == device}">
+                </option>
+            </select>
+            <button type="submit">Search</button>
+        </form>
+
+        <!-- Logout form -->
+        <form th:action="@{/logout}" method="post" style="display:inline;">
+            <button type="submit">Logout</button>
+        </form>
+    </div>
+</nav>
+
+<!-- Map container -->
 <div id="map"></div>
 
 <!-- Leaflet JS -->
-<script src="js/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
 <script th:inline="javascript">
-    // Replace these with your coordinates
-    const lat = /*[[${lat}]]*/
-    const lon = /*[[${long}]]*/
-    const zoom = /*[[${zoom}]]*/; // Zoom level
+    // Coordinates and zoom level from backend
+    const lat = /*[[${lat}]]*/;
+    const lon = /*[[${long}]]*/;
+    const zoom = /*[[${zoom}]]*/;
 
     // Initialize the map
     const map = L.map('map').setView([lat, lon], zoom);
 
     // Add OpenStreetMap tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
     // Add a marker at the location
     L.marker([lat, lon]).addTo(map)
-      .bindPopup('[[${name}]] [[${lat}]] [[${long}]]')
+      .bindPopup('[[${name}]]<br/>Lat: [[${lat}]]<br/>Lon: [[${long}]]')
       .openPopup();
 </script>
+
 </body>
 </html>

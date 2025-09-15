@@ -9,20 +9,71 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 
     <!-- Flatpickr CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"/>
 
     <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
+        body {
+          margin: 0;
+          font-family: Arial, sans-serif;
+          background: #f4f4f9;
+          display: flex;
+          flex-direction: column;
+          height: 100vh;
         }
-        #map {
-            height: 80%;
-            width: 100%;
-        }
+
         #filterForm {
-            margin: 10px;
+          background: #fff;
+          padding: 1rem;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          justify-content: space-between;
+          gap: 0.5rem;
+        }
+
+        #filterForm form {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        #filterForm label {
+          font-size: 0.9rem;
+          color: #333;
+          margin-right: 0.3rem;
+        }
+
+        #filterForm input,
+        #filterForm select {
+          padding: 0.5rem;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          font-size: 0.9rem;
+        }
+
+        #filterForm button,
+        #filterForm a {
+          padding: 0.5rem 1rem;
+          background: #4a90e2;
+          color: #fff;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 0.9rem;
+          text-decoration: none;
+          display: inline-block;
+        }
+
+        #filterForm button:hover,
+        #filterForm a:hover {
+          background: #357abd;
+        }
+
+        #map {
+          flex: 1;
+          width: 100%;
         }
     </style>
 </head>
@@ -30,40 +81,42 @@
 
 <div id="filterForm">
     <form th:action="@{/route}" method="get">
-        <label for="startDate">Start Date:</label>
+        <label for="startDate">Start:</label>
         <input type="text" id="startDate" name="startDate" placeholder="YYYY-MM-DD HH:mm:ss" required/>
 
-        <label for="endDate">End Date:</label>
+        <label for="endDate">End:</label>
         <input type="text" id="endDate" name="endDate" placeholder="YYYY-MM-DD HH:mm:ss" required/>
 
         <label for="deviceId">Device:</label>
         <select id="deviceId" name="deviceId" required>
-            <option value="">Select Device</option>
+            <option value="">Select</option>
             <option th:each="d : ${devices}" th:value="${d.id}" th:text="${d.name}"></option>
         </select>
 
         <button type="submit">Filter</button>
     </form>
+
+    <!-- Back to Home button -->
+    <a th:href="@{/}" class="home-btn">Back to Home</a>
 </div>
 
 <div id="map"></div>
 
 <!-- Leaflet JS -->
-<script src="js/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
 <!-- Flatpickr JS -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
 <script>
-    // Initialize flatpickr for datetime with seconds
     flatpickr("#startDate", {
-        enableTime: true,
-        dateFormat: "Y-m-d H:i:S",
-        time_24hr: true
+      enableTime: true,
+      dateFormat: "Y-m-d H:i:S",
+      time_24hr: true
     });
     flatpickr("#endDate", {
-        enableTime: true,
-        dateFormat: "Y-m-d H:i:S",
-        time_24hr: true
+      enableTime: true,
+      dateFormat: "Y-m-d H:i:S",
+      time_24hr: true
     });
 </script>
 
@@ -71,18 +124,15 @@
     var points = /*[[${points}]]*/ [];
 
     if(points.length > 0){
-        var map = L.map('map').setView(points[0], 15);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
+      var map = L.map('map').setView(points[0], 15);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
 
-        points.forEach(function(p){
-            L.marker(p).addTo(map);
-        });
+      points.forEach(function(p){
+        L.marker(p).addTo(map);
+      });
     }
-     //else {
-     //   alert("No points available!");
-   // }
 </script>
 
 </body>
