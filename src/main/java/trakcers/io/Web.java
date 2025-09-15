@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import trakcers.io.cacher.FastCache;
 import trakcers.io.model.Device;
 import trakcers.io.model.TrackEvent;
+import trakcers.io.model.UserAccount;
 import trakcers.io.repo.TrackLogRepo;
 
 import java.util.ArrayList;
@@ -32,8 +33,8 @@ public class Web {
         model.addAttribute("long", 0);
         model.addAttribute("zoom", 150);
         model.addAttribute("name", "Lucifer");
-        List<String> deviceList= new ArrayList<>(FastCache.deviceCache.asMap().keySet());
-        model.addAttribute("list",deviceList);
+        List<String> deviceList = new ArrayList<>(FastCache.deviceCache.asMap().keySet());
+        model.addAttribute("list", deviceList);
         try {
             TrackEvent trackEvent = FastCache.deviceCache.get(device);
             System.out.println("last id -> " + trackEvent.getTid());
@@ -76,5 +77,16 @@ public class Web {
 
 
         return "route.html";
+    }
+
+    @GetMapping("/login")
+    public String signIn(Model model) {
+        return "login.html";
+    }
+
+    @GetMapping("/register")
+    public String signUp(Model model) {
+        model.addAttribute("registerRequest", new UserAccount());
+        return "register.html";
     }
 }
