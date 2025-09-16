@@ -19,6 +19,7 @@ import trakcers.io.repo.TrackLogRepo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Controller
@@ -35,21 +36,29 @@ public class Web {
     @GetMapping("/")
     public String indexPage(Authentication authentication,
                             Model model,
-                            @RequestParam(required = false) String device) {
+                            @RequestParam(required = false) String device) throws ExecutionException {
         model.addAttribute("lat", 0);
         model.addAttribute("long", 0);
         model.addAttribute("zoom", 150);
-        model.addAttribute("name", "Lucifer");
         //List<String> deviceList = new ArrayList<>(FastCache.deviceCache.asMap().keySet());
 
         List<Device> myDevices = entityManager.createQuery(
                         "SELECT t FROM Device t WHERE t.deviceOwner = :deviceOwner", Device.class)
                 .setParameter("deviceOwner", authentication.getName())
                 .getResultList();
-
-
-
         model.addAttribute("list", myDevices);
+
+
+        // todo make it so faster
+       try {
+           Device thisDevices = entityManager.createQuery(
+                           "SELECT t FROM Device t WHERE t.deviceId = :deviceId", Device.class)
+                   .setParameter("deviceId", device).getSingleResult();
+           model.addAttribute("name", thisDevices.getDeviceName());
+       } catch (Exception e ) {
+           model.addAttribute("name", "Point");
+       }
+
         try {
             TrackEvent trackEvent = FastCache.deviceCache.get(device);
             model.addAttribute("lat", trackEvent.getLatitude());
