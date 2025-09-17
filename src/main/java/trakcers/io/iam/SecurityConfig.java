@@ -21,6 +21,7 @@ public class SecurityConfig {
                         .requestMatchers("/user/**").hasRole("USER")
                         .requestMatchers("/v1/getLocation").permitAll() // allow /register and static resources
                         .requestMatchers("/v1/register").permitAll() // allow /register and static resources
+                        .requestMatchers("/v1/getLastLatLong").permitAll() // allow /register and static resources
                         .requestMatchers("/v1/registerNewUser").permitAll() // allow /register and static resources
                         .requestMatchers("/register", "/img/**", "/css/**", "/js/**").permitAll() // allow /register and static resources
                         .anyRequest().authenticated()

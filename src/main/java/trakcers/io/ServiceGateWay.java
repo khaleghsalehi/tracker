@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import trakcers.io.cacher.FastCache;
 import trakcers.io.iam.RegisterRequest;
 import trakcers.io.model.Device;
+import trakcers.io.model.EventDTO;
 import trakcers.io.model.TrackEvent;
 import trakcers.io.model.UserAccount;
 import trakcers.io.repo.DeviceRepo;
@@ -96,5 +97,23 @@ public class ServiceGateWay {
         return;
     }
 
-
+    @GetMapping("/getLastLatLong")
+    public String setLastLocation(Authentication authentication,
+                                  @RequestParam(required = false) String deviceID) {
+        Gson gson = new Gson();
+        EventDTO eventDTO = new EventDTO();
+        try {
+            Device thisDevices = entityManager.createQuery(
+                            "SELECT t FROM Device t WHERE t.deviceId = :deviceId", Device.class)
+                    .setParameter("deviceId", deviceID).getSingleResult();
+            TrackEvent trackEvent = FastCache.deviceCache.get(deviceID);
+            eventDTO.setDevLat(trackEvent.getLatitude());
+            eventDTO.setDevLong(trackEvent.getLongitude());
+            eventDTO.setTimeStamp(trackEvent.getDate());
+            eventDTO.setDevName(thisDevices.getDeviceName());
+        } catch (Exception e) {
+            System.out.println("Ops, internal error");
+        }
+        return gson.toJson(eventDTO);
+    }
 }

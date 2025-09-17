@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="9">
+    <!-- Removed auto-refresh -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live Device Lookup</title>
 
@@ -10,66 +10,140 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 
     <style>
-        /* Reset some default styling */
+        :root { --nav-height: 56px; }
+
+        * { box-sizing: border-box; }
         body, html {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            height: 100%;
+          margin: 0;
+          padding: 0;
+          font-family: Arial, sans-serif;
+          height: 100%;
         }
 
-        /* Navigation menu */
         nav {
-            background-color: #2c3e50;
-            color: white;
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+          height: var(--nav-height);
+          background: #2c3e50;
+          color: #fff;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0 12px;
+          position: relative;
+          z-index: 1000;
+        }
+        .logo { font-weight: 700; font-size: 1.05rem; }
+
+        .menu {
+          display: flex;
+          gap: 14px;
+          align-items: center;
+        }
+        .menu a {
+          color: #fff;
+          text-decoration: none;
+          font-weight: 600;
+          padding: 6px 8px;
+          border-radius: 6px;
+        }
+        .menu a:hover { background: rgba(255,255,255,0.06); }
+
+        .controls {
+          display: flex;
+          gap: 8px;
+          align-items: center;
+        }
+        .controls select, .controls button {
+          padding: 6px 10px;
+          border-radius: 6px;
+          border: none;
+          font-size: 0.95rem;
+        }
+        .controls button { background: #3498db; color: white; cursor: pointer; }
+        .controls button.logout { background: #e74c3c; }
+
+        .hamburger {
+          display: none;
+          width: 40px;
+          height: 40px;
+          align-items: center;
+          justify-content: center;
+          background: transparent;
+          border: none;
+          cursor: pointer;
+        }
+        .hamburger .bar {
+          display: block;
+          width: 22px;
+          height: 2px;
+          background: white;
+          margin: 3px 0;
+          border-radius: 2px;
         }
 
-        nav .menu a {
-            color: white;
-            text-decoration: none;
-            margin-right: 15px;
-            font-weight: bold;
+        .mobile-menu {
+          position: absolute;
+          top: var(--nav-height);
+          right: 0;
+          width: 300px;
+          max-width: 86%;
+          height: calc(100vh - var(--nav-height));
+          background: #34495e;
+          padding: 14px;
+          box-shadow: -6px 8px 24px rgba(0,0,0,0.25);
+          z-index: 1500;
+          transform: translateX(100%);
+          opacity: 0;
+          transition: transform 220ms ease, opacity 220ms ease;
+          pointer-events: none;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        .mobile-menu.show {
+          transform: translateX(0);
+          opacity: 1;
+          pointer-events: auto;
+        }
+        .mobile-menu a {
+          color: #fff;
+          text-decoration: none;
+          font-weight: 600;
+          padding: 10px;
+          border-radius: 8px;
+          background: rgba(255,255,255,0.03);
         }
 
-        nav .menu a:hover {
-            text-decoration: underline;
+        .mobile-menu form { display: flex; flex-direction: column; gap: 8px; }
+        .mobile-menu select, .mobile-menu button {
+          padding: 10px;
+          border-radius: 6px;
+          border: none;
+          font-size: 0.95rem;
         }
 
-        /* Forms in navbar */
-        nav form {
-            display: inline;
-        }
-
-        nav select, nav button {
-            padding: 5px 10px;
-            margin-left: 5px;
-            font-size: 1rem;
-        }
-
-        /* Fullscreen map container */
         #map {
-            width: 100%;
-            height: calc(100vh - 60px); /* full height minus navbar */
+          width: 100%;
+          height: calc(100vh - var(--nav-height));
+        }
+
+        @media (max-width: 768px) {
+          .menu, .controls { display: none; }
+          .hamburger { display: flex; }
         }
     </style>
 </head>
 <body>
 
-<!-- Navigation bar -->
 <nav>
+    <div class="logo">Device Tracker</div>
+
     <div class="menu">
         <a th:href="@{/}">Home</a>
         <a th:href="@{/route}">Route</a>
     </div>
 
     <div class="controls">
-        <!-- Device selection form -->
-        <form th:action="@{/}" method="get">
-            <label for="device">Device:</label>
+        <form th:action="@{/}" method="get" style="display:flex; gap:8px; align-items:center;">
             <select id="device" name="device">
                 <option th:each="item : ${list}"
                         th:value="${item.deviceId}"
@@ -80,41 +154,131 @@
             <button type="submit">Search</button>
         </form>
 
-        <!-- Logout form -->
-        <form action="/device" method="get" style="display:inline;">
-            <button type="submit">Register New Device</button>
+        <form action="/device" method="get" style="margin:0;">
+            <button type="submit">Register</button>
         </form>
-        <form th:action="@{/logout}" method="post" style="display:inline;">
-            <button type="submit">Logout</button>
+
+        <form th:action="@{/logout}" method="post" style="margin:0;">
+            <button class="logout" type="submit">Logout</button>
         </form>
     </div>
+
+    <button id="hamburgerBtn" class="hamburger" aria-label="Open menu" aria-expanded="false" type="button">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+    </button>
 </nav>
 
-<!-- Map container -->
+<div id="mobileMenu" class="mobile-menu" aria-hidden="true">
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/route}">Route</a>
+
+    <form th:action="@{/}" method="get">
+        <select id="device-mobile" name="device">
+            <option th:each="item : ${list}"
+                    th:value="${item.deviceId}"
+                    th:text="${item.deviceName}"
+                    th:selected="${item == device}">
+            </option>
+        </select>
+        <button type="submit">Search</button>
+    </form>
+
+    <form action="/device" method="get">
+        <button type="submit">Register Device</button>
+    </form>
+
+    <form th:action="@{/logout}" method="post">
+        <button class="logout" type="submit">Logout</button>
+    </form>
+</div>
+
 <div id="map"></div>
 
 <!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="js/leaflet.js"></script>
 
 <script th:inline="javascript">
-    // Coordinates and zoom level from backend
+    /* ====== Mobile menu behavior ====== */
+    document.addEventListener('DOMContentLoaded', function () {
+      const btn = document.getElementById('hamburgerBtn');
+      const menu = document.getElementById('mobileMenu');
+
+      function openMenu() {
+        menu.classList.add('show');
+        btn.setAttribute('aria-expanded', 'true');
+        menu.setAttribute('aria-hidden', 'false');
+      }
+      function closeMenu() {
+        menu.classList.remove('show');
+        btn.setAttribute('aria-expanded', 'false');
+        menu.setAttribute('aria-hidden', 'true');
+      }
+      function toggleMenu(e) {
+        e.stopPropagation();
+        if (menu.classList.contains('show')) closeMenu();
+        else openMenu();
+      }
+
+      btn.addEventListener('click', toggleMenu);
+      document.addEventListener('click', function (ev) {
+        if (menu.classList.contains('show')) {
+          if (!menu.contains(ev.target) && ev.target !== btn) {
+            closeMenu();
+          }
+        }
+      });
+      menu.addEventListener('click', function (ev) { ev.stopPropagation(); });
+      document.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Escape' && menu.classList.contains('show')) closeMenu();
+      });
+    });
+
+    /* ====== Device ID from query param ====== */
+    const params = new URLSearchParams(window.location.search);
+    const deviceId = params.get("device");  // e.g., /?device=123
+
+    /* ====== Leaflet map init ====== */
     const lat = /*[[${lat}]]*/;
     const lon = /*[[${long}]]*/;
     const zoom = /*[[${zoom}]]*/;
 
-    // Initialize the map
     const map = L.map('map').setView([lat, lon], zoom);
 
-    // Add OpenStreetMap tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // Add a marker at the location
-    L.marker([lat, lon]).addTo(map)
-      .bindPopup('[[${name}]]<br/>Lat: [[${lat}]]<br/>Lon: [[${long}]]')
+    let marker = L.marker([lat, lon]).addTo(map)
+      .bindPopup('Name:[[${name}]]<br/>Lat: [[${lat}]]<br/>Lon: [[${long}]]<br/>Time: [[${lastSeen}]]')
       .openPopup();
-</script>
 
+    /* ====== API Polling ====== */
+    async function fetchLatestPosition() {
+      if (!deviceId) {
+        console.warn("No deviceId found in URL");
+        return;
+      }
+
+      try {
+        const response = await fetch(`/v1/getLastLatLong?deviceID=${deviceId}`);
+        if (!response.ok) throw new Error("API error");
+
+        const data = await response.json();
+        const newLat = data.devLat;
+        const newLon = data.devLong;
+        const newName = data.devName;
+        const newTime = data.timeStamp;
+
+        marker.setLatLng([newLat, newLon]);
+        marker.setPopupContent(`${newName}<br/>Lat: ${newLat}<br/>Lon: ${newLon}<br/>Time: ${newTime}`);
+      } catch (err) {
+        console.error("Failed to fetch position:", err);
+      }
+    }
+
+    setInterval(fetchLatestPosition, 1000); // every 1s
+</script>
 </body>
 </html>
