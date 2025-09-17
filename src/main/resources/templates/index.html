@@ -270,9 +270,10 @@
         const newLon = data.devLong;
         const newName = data.devName;
         const newTime = data.timeStamp;
+        const newBattery = data.devBattery;
 
         marker.setLatLng([newLat, newLon]);
-        marker.setPopupContent(`${newName}<br/>Lat: ${newLat}<br/>Lon: ${newLon}<br/>Time: ${newTime}`);
+        marker.setPopupContent(`${newName}<br/>Battery: %${newBattery}<br/>Lat: ${newLat}<br/>Lon: ${newLon}<br/>Time: ${newTime}`);
       } catch (err) {
         console.error("Failed to fetch position:", err);
       }

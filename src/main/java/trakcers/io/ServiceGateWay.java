@@ -115,6 +115,7 @@ public class ServiceGateWay {
                 eventDTO.setDevLong(trackEvent.getLongitude());
                 eventDTO.setTimeStamp(trackEvent.getDate());
                 eventDTO.setDevName(thisDevices.getDeviceName());
+                eventDTO.setDevBattery(trackEvent.getBattery());
             } else {
                 System.out.println("device owner is not permitted.");
             }

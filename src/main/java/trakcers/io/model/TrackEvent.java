@@ -27,6 +27,7 @@ public class TrackEvent {
     String android;
     String id;
     String date;
+    String battery;
     String latitude;
     String longitude;
     String altitude;

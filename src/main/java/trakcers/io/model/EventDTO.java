@@ -10,4 +10,6 @@ public class EventDTO {
     private String devLong;
     private String devName;
     private String timeStamp;
+    private String devBattery;
+
 }
