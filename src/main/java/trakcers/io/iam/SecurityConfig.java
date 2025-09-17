@@ -19,10 +19,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/user/**").hasRole("USER")
-                        .requestMatchers("/v1/getLocation").permitAll() // allow /register and static resources
-                        .requestMatchers("/v1/register").permitAll() // allow /register and static resources
-                        .requestMatchers("/v1/getLastLatLong").permitAll() // allow /register and static resources
-                        .requestMatchers("/v1/registerNewUser").permitAll() // allow /register and static resources
+                        .requestMatchers("/v1/register").permitAll()
+                        .requestMatchers("/v1/registerNewUser").permitAll()
+                        .requestMatchers("/v1/getLocation").permitAll()
+                        .requestMatchers("/v1/getLastLatLong").permitAll()
                         .requestMatchers("/register", "/img/**", "/css/**", "/js/**").permitAll() // allow /register and static resources
                         .anyRequest().authenticated()
                 )

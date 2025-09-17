@@ -100,17 +100,24 @@ public class ServiceGateWay {
     @GetMapping("/getLastLatLong")
     public String setLastLocation(Authentication authentication,
                                   @RequestParam(required = false) String deviceID) {
+
+
         Gson gson = new Gson();
         EventDTO eventDTO = new EventDTO();
         try {
             Device thisDevices = entityManager.createQuery(
                             "SELECT t FROM Device t WHERE t.deviceId = :deviceId", Device.class)
                     .setParameter("deviceId", deviceID).getSingleResult();
-            TrackEvent trackEvent = FastCache.deviceCache.get(deviceID);
-            eventDTO.setDevLat(trackEvent.getLatitude());
-            eventDTO.setDevLong(trackEvent.getLongitude());
-            eventDTO.setTimeStamp(trackEvent.getDate());
-            eventDTO.setDevName(thisDevices.getDeviceName());
+            if (authentication.getName().equals(thisDevices.getDeviceOwner())) {
+                System.out.println("device owner " + thisDevices.getDeviceOwner() + " is matched by" + authentication.getName());
+                TrackEvent trackEvent = FastCache.deviceCache.get(deviceID);
+                eventDTO.setDevLat(trackEvent.getLatitude());
+                eventDTO.setDevLong(trackEvent.getLongitude());
+                eventDTO.setTimeStamp(trackEvent.getDate());
+                eventDTO.setDevName(thisDevices.getDeviceName());
+            } else {
+                System.out.println("device owner is not permitted.");
+            }
         } catch (Exception e) {
             System.out.println("Ops, internal error");
         }
