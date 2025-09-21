@@ -272,8 +272,18 @@
         const newTime = data.timeStamp;
         const newBattery = data.devBattery;
 
+
+
+        const newDevLockStatus = data.devLockStatus;
+        const newDevSecStatus = data.devSecStatus;
+
+        // Convert to boolean explicitly
+        let screenLocked = (newDevLockStatus === true || newDevLockStatus === "true" || newDevLockStatus === 1) ? "Yes" : "No";
+        let protectedByPassword = (newDevSecStatus === true || newDevSecStatus === "true" || newDevSecStatus === 1) ? "Yes" : "No";
+
+
         marker.setLatLng([newLat, newLon]);
-        marker.setPopupContent(`${newName}<br/>Battery: %${newBattery}<br/>Lat: ${newLat}<br/>Lon: ${newLon}<br/>Time: ${newTime}`);
+        marker.setPopupContent(`${newName}<br/>Battery: %${newBattery}<br/>Screen Locked: ${screenLocked}<br/>Password/Pin/Finger/Pattern Protection: ${protectedByPassword}<br/>Lat: ${newLat}<br/>Lon: ${newLon}<br/>Time: ${newTime}`);
       } catch (err) {
         console.error("Failed to fetch position:", err);
       }

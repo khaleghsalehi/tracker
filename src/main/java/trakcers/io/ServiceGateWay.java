@@ -114,6 +114,8 @@ public class ServiceGateWay {
                 eventDTO.setDevLat(trackEvent.getLatitude());
                 eventDTO.setDevLong(trackEvent.getLongitude());
                 eventDTO.setTimeStamp(trackEvent.getDate());
+                eventDTO.setDevLockStatus(trackEvent.getLocked()); // is device is locked
+                eventDTO.setDevSecStatus(trackEvent.getSecured()); // is device is secured
                 eventDTO.setDevName(thisDevices.getDeviceName());
                 eventDTO.setDevBattery(trackEvent.getBattery());
             } else {

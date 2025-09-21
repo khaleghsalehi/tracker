@@ -1,0 +1,111 @@
+what feature of device can be obtain by code in android
+ChatGPT said:
+
+Great question 👍 — in Android, your code can access a wide range of device features through system APIs (with user permissions where required).
+Here’s a breakdown of what you can obtain or use:
+
+📍 Location & Motion
+
+GPS / Network Location → latitude, longitude, altitude, speed.
+
+Cell Tower & Wi-Fi info → for location triangulation.
+
+Step Counter & Motion Sensors → detect walking, running, sitting.
+
+Accelerometer / Gyroscope → movement, shake detection, orientation.
+
+Magnetometer (Compass) → direction (N/S/E/W).
+
+Barometer → altitude / air pressure.
+
+📞 Communication & Network
+
+SIM card info (carrier, country, operator name).
+
+IMEI / Device ID (restricted in newer Android versions).
+
+Phone number (if available on SIM, often restricted).
+
+Call logs & SMS (requires dangerous permissions, limited on Android 10+).
+
+Contacts list (requires permission).
+
+Network status → Wi-Fi, Mobile Data, Bluetooth on/off.
+
+Hotspot/Tethering control (limited APIs).
+
+🎥 Media & Camera
+
+Camera access → take photo, record video, scan QR/barcodes.
+
+Microphone → record audio, voice commands.
+
+Gallery & Media Store → access images, videos, audio.
+
+Screen Recording / Screenshot (needs special API + user consent).
+
+🔋 Device State
+
+Battery level & charging state.
+
+Power source → charging via USB, AC, wireless.
+
+Storage info → free/used memory, external SD card.
+
+RAM usage & performance stats.
+
+CPU temperature & usage (via system APIs or root in some cases).
+
+🔒 Security & Identity
+
+Biometrics → fingerprint, face, iris authentication.
+
+Device lock status (screen locked/unlocked).
+
+Keystore → for secure data storage.
+
+Installed apps list (restricted on Android 11+).
+
+Permissions status → check if user granted/denied.
+
+📱 Hardware & System
+
+Device model, manufacturer, OS version.
+
+Screen resolution, DPI, orientation.
+
+Audio state → volume level, silent/vibrate mode.
+
+Vibration control (haptic feedback).
+
+Flashlight control.
+
+USB connection status.
+
+🌐 Sensors / External
+
+Bluetooth devices nearby (paired & scanned).
+
+NFC → read/write NFC tags.
+
+Fingerprint sensor hardware availability.
+
+Proximity sensor (near/far detection, e.g., during calls).
+
+Light sensor (ambient brightness).
+
+⚡ Advanced (with restrictions / special permissions)
+
+Accessibility Services → read screen content (useful for parental control).
+
+Usage Stats → which apps were used, and for how long.
+
+Background Services → monitor location, geofence alerts.
+
+Device Admin / MDM APIs → lock device, wipe data (enterprise apps).
+
+JobScheduler / WorkManager → background task scheduling.
+
+👉 In short, with permissions + APIs, you can read or control almost every part of the device — though modern Android (10–14) restricts sensitive features like call logs, SMS, IMEI, and background tracking for privacy reasons.
+
+Would you like me to make a table (feature → required permission → Android version limits) so you can directly map what you can/can’t use in your kids tracking app?
