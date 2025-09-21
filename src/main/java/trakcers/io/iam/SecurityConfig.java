@@ -17,13 +17,17 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+
+                        .requestMatchers("/css/**").permitAll()
+                        .requestMatchers("/js/**").permitAll()
+                        .requestMatchers("/img/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/user/**").hasRole("USER")
                         .requestMatchers("/v1/register").permitAll()
                         .requestMatchers("/v1/registerNewUser").permitAll()
                         .requestMatchers("/v1/getLocation").permitAll()
                         .requestMatchers("/v1/getLastLatLong").permitAll()
-                        .requestMatchers("/register", "/img/**", "/css/**", "/js/**").permitAll() // allow /register and static resources
+                        .requestMatchers("/register", "/img/**", "/static/css/**", "/static/js/**").permitAll() // allow /register and static resources
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

@@ -83,7 +83,7 @@ public class ServiceGateWay {
         System.out.println("password  -> " + request.getPassword());
         // Check if username already exists
         if (repo.findByUsername(request.getUsername()).isPresent()) {
-            response.sendRedirect("/register");
+            response.sendRedirect("/register?msg=Error: Username "+request.getUsername()+" exist,Please try with other name.");
             return;
         }
 

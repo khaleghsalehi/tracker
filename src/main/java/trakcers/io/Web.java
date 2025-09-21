@@ -110,8 +110,10 @@ public class Web {
     }
 
     @GetMapping("/register")
-    public String signUp(Model model) {
+    public String signUp(Model model, @RequestParam(required = false) String msg) {
+        model.addAttribute("msg", msg);
         model.addAttribute("registerRequest", new UserAccount());
+
         return "register.html";
     }
 
